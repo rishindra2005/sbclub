@@ -56,6 +56,12 @@ export default function TrialPage() {
     try {
       const formData = new FormData();
       formData.append('prompt', inputText);
+
+      // Add history
+      if (trial.messages.length > 0) {
+          formData.append('history', JSON.stringify(trial.messages));
+      }
+
       if (selectedImage) {
         formData.append('image', selectedImage);
       }
