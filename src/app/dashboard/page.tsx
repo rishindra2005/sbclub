@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ITrial } from '@/models/trial.model';
 import Image from 'next/image';
 import Link from 'next/link';
+import styles from './dashboard.module.css';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -107,14 +108,14 @@ export default function DashboardPage() {
                 {trials.map((trial) => {
                   const assistantImages = trial.messages.filter(msg => msg.sender === 'assistant' && msg.imageUrl);
                   return (
-                    <div key={trial._id} className="bg-white rounded-lg shadow-xl overflow-hidden transition-transform hover:-translate-y-1">
+                    <div key={trial._id} className="bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden transition-transform hover:-translate-y-1">
                       <div className="p-5">
-                        <h3 className="font-bold text-lg text-gray-900 truncate">{trial.name}</h3>
-                        <p className="text-sm text-gray-500">{new Date(trial.createdAt).toLocaleDateString()}</p>
+                        <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 truncate">{trial.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(trial.createdAt).toLocaleDateString()}</p>
                       </div>
                       {assistantImages.length > 0 && (
                         <div className="px-5 pb-5">
-                          <h4 className="font-semibold text-sm text-gray-600 mb-3">Image Preview</h4>
+                          <h4 className="font-semibold text-sm text-gray-600 dark:text-gray-300 mb-3">Image Preview</h4>
                           <div className="grid grid-cols-3 gap-2">
                             {assistantImages.slice(0, 5).map((img, index) => (
                               <div key={index} className="relative aspect-square">
@@ -127,15 +128,15 @@ export default function DashboardPage() {
                               </div>
                             ))}
                             {assistantImages.length > 5 && (
-                              <div className="bg-gray-100 rounded-md flex items-center justify-center aspect-square">
-                                <p className="text-xs font-bold text-gray-500">+{assistantImages.length - 5}</p>
+                              <div className="bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center aspect-square">
+                                <p className="text-xs font-bold text-gray-500 dark:text-gray-400">+{assistantImages.length - 5}</p>
                               </div>
                             )}
                           </div>
                         </div>
                       )}
-                      <div className="px-5 py-3 bg-gray-50 border-t">
-                        <a href={`/trial/${trial._id}`} className="text-indigo-600 hover:text-indigo-900 font-semibold text-sm">
+                      <div className="px-5 py-3 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700">
+                        <a href={`/trial/${trial._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold text-sm">
                           View Trial &rarr;
                         </a>
                       </div>
@@ -151,18 +152,18 @@ export default function DashboardPage() {
       {/* New Trial Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Name Your New Trial</h2>
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Name Your New Trial</h2>
             <input 
               type="text"
               value={newTrialName}
               onChange={(e) => setNewTrialName(e.target.value)}
               placeholder="e.g., Summer Outfit Ideas"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md mb-6"
+              className={`w-full px-4 py-2 border border-gray-300 rounded-md mb-6 ${styles.textInput}`}
               onKeyDown={(e) => e.key === 'Enter' && handleCreateTrial()}
             />
             <div className="flex justify-end gap-4">
-              <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100">Cancel</button>
+              <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
               <button onClick={handleCreateTrial} className="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700">Create Trial</button>
             </div>
           </div>

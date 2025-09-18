@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import { ITrial, IMessage } from '@/models/trial.model';
 import ImageUploader from '@/components/ImageUploader';
 import OutfitBox from '@/components/OutfitBox';
+import styles from './trial.module.css';
 
 // Define user interface locally
 interface IUserProfile {
@@ -280,7 +281,7 @@ export default function TrialPage() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Describe the outfit... or paste an image"
-                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className={`flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none ${styles.promptInput}`}
                 rows={3}
                 disabled={isAssistantTyping}
               />

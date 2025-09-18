@@ -1,0 +1,19 @@
+.textInput {
+  color: #171717 !important;
+  background-color: #ffffff !important;
+}
+
+.textInput::placeholder {
+  color: #9ca3af !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .textInput {
+    color: #ededed !important;
+    background-color: #1f2937 !important;
+  }
+
+  .textInput::placeholder {
+    color: #6b7280 !important;
+  }
+}
