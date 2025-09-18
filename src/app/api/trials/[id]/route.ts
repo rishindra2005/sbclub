@@ -77,6 +77,23 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
 }
 
 export async function DELETE(req: Request, context: { params: { id: string } }) {
-    // TODO: Implement trial deletion
-    return NextResponse.json({ message: 'Not Implemented' }, { status: 501 });
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+
+  await connectToDB();
+
+  try {
+    const deletedTrial = await Trial.findOneAndDelete({ _id: context.params.id, userId: session.user.id });
+
+    if (!deletedTrial) {
+      return NextResponse.json({ message: 'Trial not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: 'Trial deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting trial:', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
 }

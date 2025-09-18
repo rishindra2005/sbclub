@@ -88,16 +88,16 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading && !user) return <p className="p-4 text-center">Loading profile...</p>;
-  if (error) return <p className="p-4 text-center text-red-500">{error}</p>;
-  if (!user) return <p className="p-4 text-center">Could not load profile.</p>;
+  if (loading && !user) return <p className="p-4 text-center text-cyan-400 font-mono">Loading Profile...</p>;
+  if (error) return <p className="p-4 text-center text-red-400 font-mono">{error}</p>;
+  if (!user) return <p className="p-4 text-center text-cyan-400 font-mono">Could not load profile.</p>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-20">
+    <div className="min-h-screen bg-gray-900 text-white font-mono">
+      <header className="bg-gray-900/50 backdrop-blur-lg shadow-cyan-400/20 shadow-lg sticky top-0 z-20 border-b border-cyan-400/20">
         <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-gray-900">Your Profile</h1>
-          <Link href="/dashboard" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+          <h1 className="text-2xl font-bold text-cyan-400 tracking-widest" style={{ textShadow: '0 0 5px #00ffff' }}>YOUR PROFILE</h1>
+          <Link href="/dashboard" className="text-sm font-medium text-cyan-400 hover:text-cyan-300">
             &larr; Back to Dashboard
           </Link>
         </div>
@@ -105,18 +105,18 @@ export default function ProfilePage() {
 
       <main className="py-10">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="bg-white p-8 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800">{user.name}</h2>
-            <p className="text-gray-500">{user.email}</p>
+          <div className="bg-gray-900/50 border border-cyan-400/50 p-8 rounded-lg shadow-2xl shadow-cyan-400/10">
+            <h2 className="text-2xl font-bold text-cyan-400">{user.name}</h2>
+            <p className="text-gray-400">{user.email}</p>
 
-            <hr className="my-8" />
+            <hr className="my-8 border-cyan-400/20" />
 
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Images</h3>
-            <p className="text-sm text-gray-600 mb-4">Upload up to 3 images of yourself to use in virtual try-ons. These will be sent to the AI when you start a new chat.</p>
+            <h3 className="text-xl font-semibold text-cyan-400 mb-4">Your Images</h3>
+            <p className="text-sm text-gray-400 mb-4">Upload up to 3 images of yourself to use in virtual try-ons. These will be sent to the AI when you start a new chat.</p>
             
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
               {existingImages.map((imageUrl, index) => (
-                <div key={index} className="relative group">
+                <div key={index} className="relative group border-2 border-cyan-400/50 rounded-lg overflow-hidden">
                   <Image src={imageUrl} alt={`User image ${index + 1}`} width={200} height={200} className="rounded-lg object-cover aspect-square" />
                   <button 
                     onClick={() => handleDeleteExistingImage(imageUrl)}
@@ -141,9 +141,9 @@ export default function ProfilePage() {
               <button 
                 onClick={handleSaveChanges} 
                 disabled={loading}
-                className="px-6 py-2 rounded-md bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:bg-gray-400"
+                className="px-6 py-2 rounded-md bg-cyan-400 text-gray-900 font-bold hover:bg-cyan-300 disabled:bg-gray-600"
               >
-                {loading ? 'Saving...' : 'Save Changes'}
+                {loading ? 'SAVING...' : 'SAVE CHANGES'}
               </button>
             </div>
           </div>

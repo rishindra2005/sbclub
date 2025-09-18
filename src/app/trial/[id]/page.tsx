@@ -7,7 +7,6 @@ import { useParams } from 'next/navigation';
 import { ITrial, IMessage } from '@/models/trial.model';
 import ImageUploader from '@/components/ImageUploader';
 import OutfitBox from '@/components/OutfitBox';
-import styles from './trial.module.css';
 
 // Define user interface locally
 interface IUserProfile {
@@ -128,7 +127,9 @@ export default function TrialPage() {
       const formData = new FormData();
       let prompt = inputText;
       if (outfitDescription) {
-        prompt = `[Outfit Description: ${outfitDescription}] \n\n ${inputText}`;
+        prompt = `[Outfit Description: ${outfitDescription}] 
+
+ ${inputText}`;
         setOutfitDescription(''); // Clear after use
         setDescribedImage(null); // Clear the image preview
       }
@@ -195,26 +196,26 @@ export default function TrialPage() {
 
   const assistantImages = trial?.messages.filter(msg => msg.sender === 'assistant' && msg.imageUrl) || [];
 
-  if (loading) return <p className="p-4 text-center">Loading trial...</p>;
-  if (error) return <p className="p-4 text-center text-red-500">Error: {error}</p>;
-  if (!trial) return <p className="p-4 text-center">Trial not found.</p>;
+  if (loading) return <p className="p-4 text-center text-cyan-400 font-mono">Loading Trial...</p>;
+  if (error) return <p className="p-4 text-center text-red-400 font-mono">Error: {error}</p>;
+  if (!trial) return <p className="p-4 text-center text-cyan-400 font-mono">Trial not found.</p>;
 
   return (
-    <div className="flex h-screen flex-col bg-gray-100">
+    <div className="flex h-screen flex-col bg-gray-900 text-white font-mono">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-20">
+      <header className="bg-gray-900/50 backdrop-blur-lg shadow-cyan-400/20 shadow-lg sticky top-0 z-20 border-b border-cyan-400/20">
         <div className="mx-auto flex h-16 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/dashboard" className="text-sm font-medium text-indigo-600 hover:text-indigo-500 flex items-center gap-1">&larr; Dashboard</Link>
+          <Link href="/dashboard" className="text-sm font-medium text-cyan-400 hover:text-cyan-300 flex items-center gap-1">&larr; Dashboard</Link>
           <div className="flex-1 text-center">
             {isEditingName ? (
               <div className="flex items-center justify-center gap-2">
-                <input type="text" value={editingName} onChange={(e) => setEditingName(e.target.value)} className="px-2 py-1 text-xl font-bold text-gray-900 bg-transparent border-b-2 border-indigo-500 focus:outline-none" onKeyDown={(e) => e.key === 'Enter' && handleUpdateTrialName()}/>
-                <button onClick={handleUpdateTrialName} className="text-sm font-semibold text-green-600 hover:text-green-800">Save</button>
-                <button onClick={() => setIsEditingName(false)} className="text-sm text-red-600 hover:text-red-800">Cancel</button>
+                <input type="text" value={editingName} onChange={(e) => setEditingName(e.target.value)} className="px-2 py-1 text-xl font-bold text-cyan-400 bg-transparent border-b-2 border-cyan-400 focus:outline-none" onKeyDown={(e) => e.key === 'Enter' && handleUpdateTrialName()}/>
+                <button onClick={handleUpdateTrialName} className="text-sm font-semibold text-green-500 hover:text-green-400">Save</button>
+                <button onClick={() => setIsEditingName(false)} className="text-sm text-red-500 hover:text-red-400">Cancel</button>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-3 group cursor-pointer" onClick={() => setIsEditingName(true)}>
-                <h1 className="truncate text-xl font-bold text-gray-900">{trial.name}</h1>
+                <h1 className="truncate text-xl font-bold text-cyan-400">{trial.name}</h1>
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fillRule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clipRule="evenodd" /></svg></div>
               </div>
             )}
@@ -229,26 +230,27 @@ export default function TrialPage() {
           <div className="mx-auto max-w-2xl space-y-6">
             {trial.messages.map((msg, index) => (
               <div key={index} className={`flex items-end gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                {msg.sender === 'assistant' && <div className="w-8 h-8 rounded-full bg-violet-200 flex items-center justify-center font-bold text-violet-700">A</div>}
-                <div className={`max-w-md rounded-2xl px-4 py-3 shadow-md ${ msg.sender === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white text-gray-900 rounded-bl-none' }`}>
+                {msg.sender === 'assistant' && <div className="w-8 h-8 rounded-full bg-purple-500/50 flex items-center justify-center font-bold text-purple-300">A</div>}
+                <div className={`max-w-md rounded-2xl px-4 py-3 shadow-lg ${ msg.sender === 'user' ? 'bg-cyan-600/50 text-white rounded-br-none' : 'bg-gray-800/50 text-gray-300 rounded-bl-none' }`}>
                   {msg.text && <p className="text-sm">{msg.text}</p>}
                   {msg.imageUrl && <Image src={msg.imageUrl} alt="Generated outfit" width={300} height={300} className="mt-2 rounded-lg cursor-pointer transition-transform hover:scale-105" onClick={() => setModalImageUrl(msg.imageUrl!)} />}
                 </div>
-                {msg.sender === 'user' && <div className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center font-bold text-blue-700">Y</div>}
+                {msg.sender === 'user' && <div className="w-8 h-8 rounded-full bg-cyan-500/50 flex items-center justify-center font-bold text-cyan-300">Y</div>}
               </div>
             ))}
-            {isAssistantTyping && <div className="flex items-end gap-2 justify-start"><div className="w-8 h-8 rounded-full bg-violet-200 flex items-center justify-center font-bold text-violet-700">A</div><div className="max-w-md rounded-2xl px-4 py-3 shadow-md bg-white text-gray-900 rounded-bl-none"><div className="flex items-center justify-center space-x-1"><div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.3s]"></div><div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.15s]"></div><div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div></div></div></div>}
+            {isAssistantTyping && <div className="flex items-end gap-2 justify-start"><div className="w-8 h-8 rounded-full bg-purple-500/50 flex items-center justify-center font-bold text-purple-300">A</div><div className="max-w-md rounded-2xl px-4 py-3 shadow-lg bg-gray-800/50 text-gray-300 rounded-bl-none"><div className="flex items-center justify-center space-x-1"><div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.3s]"></div><div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.15s]"></div><div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div></div></div></div>}
           </div>
         </main>
 
         {/* Image Gallery Sidebar */}
-        <aside className="w-64 flex-shrink-0 bg-gray-50 p-4 border-l border-gray-200 overflow-y-auto">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Image Gallery</h2>
+        <aside className="w-64 flex-shrink-0 bg-gray-900/50 p-4 border-l border-cyan-400/20 overflow-y-auto">
+          <h2 className="text-lg font-bold text-cyan-400 mb-4">Image Gallery</h2>
           {assistantImages.length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
               {assistantImages.map((imgMsg, index) => (
-                <div key={index} className="cursor-pointer group" onClick={() => setModalImageUrl(imgMsg.imageUrl!)}>
-                  <Image src={imgMsg.imageUrl!} alt={`Generated outfit ${index + 1}`} width={100} height={100} className="rounded-md object-cover aspect-square transition-transform group-hover:scale-105 shadow-md"/>
+                <div key={index} className="cursor-pointer group relative" onClick={() => setModalImageUrl(imgMsg.imageUrl!)}>
+                  <Image src={imgMsg.imageUrl!} alt={`Generated outfit ${index + 1}`} width={100} height={100} className="rounded-md object-cover aspect-square transition-transform group-hover:scale-105 shadow-lg"/>
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md border-2 border-transparent group-hover:border-cyan-400"></div>
                 </div>
               ))}
             </div>
@@ -259,14 +261,14 @@ export default function TrialPage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white/80 backdrop-blur-lg p-4 border-t border-gray-200 z-10">
+      <footer className="bg-gray-900/50 backdrop-blur-lg p-4 border-t border-cyan-400/20 z-10">
         <div className="mx-auto max-w-4xl">
           {userProfileImages.length > 0 && (
             <div className="mb-4">
-              <p className="text-sm font-semibold text-gray-700 mb-2">Select from your profile images:</p>
+              <p className="text-sm font-semibold text-cyan-400 mb-2">Select from your profile images:</p>
               <div className="flex items-center gap-3">
                 {userProfileImages.map((imgUrl, index) => (
-                  <div key={index} className={`relative cursor-pointer rounded-lg overflow-hidden border-2 ${selectedImages.some(f => f.name === `profile-image-${index}`) ? 'border-indigo-500' : 'border-transparent'}`} onClick={() => handleToggleProfileImage(imgUrl)}>
+                  <div key={index} className={`relative cursor-pointer rounded-lg overflow-hidden border-2 ${selectedImages.some(f => f.name === `profile-image-${index}`) ? 'border-cyan-400' : 'border-transparent'}`} onClick={() => handleToggleProfileImage(imgUrl)}>
                     <Image src={imgUrl} alt={`Your Image ${index + 1}`} width={60} height={60} className="object-cover aspect-square" />
                   </div>
                 ))}
@@ -281,11 +283,11 @@ export default function TrialPage() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Describe the outfit... or paste an image"
-                className={`flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none ${styles.promptInput}`}
+                className="flex-1 rounded-lg border border-cyan-400/50 bg-gray-900/50 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 resize-none"
                 rows={3}
                 disabled={isAssistantTyping}
               />
-              <button type="submit" className="rounded-full bg-indigo-600 p-2 text-white hover:bg-indigo-700 disabled:bg-gray-400" disabled={isAssistantTyping || (!inputText.trim() && selectedImages.length === 0)}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg></button>
+              <button type="submit" className="rounded-full bg-cyan-400 p-3 text-gray-900 hover:bg-cyan-300 disabled:bg-gray-600" disabled={isAssistantTyping || (!inputText.trim() && selectedImages.length === 0)}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg></button>
             </form>
             <div className="w-48">
               <OutfitBox 
@@ -306,10 +308,10 @@ export default function TrialPage() {
 
       {/* Modal */}
       {modalImageUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50" onClick={() => setModalImageUrl(null)}>
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 backdrop-blur-sm" onClick={() => setModalImageUrl(null)}>
           <div className="relative p-4" onClick={(e) => e.stopPropagation()}>
-            <Image src={modalImageUrl} alt="Enlarged outfit" width={800} height={800} className="max-w-screen-lg max-h-[80vh] object-contain rounded-lg shadow-2xl" />
-            <a href={modalImageUrl} download={`v-closet-image.png`} className="absolute bottom-8 right-8 bg-indigo-600 text-white px-5 py-2 rounded-full hover:bg-indigo-700 text-sm font-semibold shadow-lg transition-transform hover:scale-105">Download</a>
+            <Image src={modalImageUrl} alt="Enlarged outfit" width={800} height={800} className="max-w-screen-lg max-h-[80vh] object-contain rounded-lg shadow-2xl shadow-cyan-400/20" />
+            <a href={modalImageUrl} download={`v-closet-image.png`} className="absolute bottom-8 right-8 bg-cyan-400 text-gray-900 px-5 py-2 rounded-full hover:bg-cyan-300 text-sm font-bold shadow-lg transition-transform hover:scale-105">DOWNLOAD</a>
             <button onClick={() => setModalImageUrl(null)} className="absolute top-0 right-0 m-4 text-white bg-black/50 rounded-full p-2 leading-none hover:bg-black/75"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
           </div>
         </div>

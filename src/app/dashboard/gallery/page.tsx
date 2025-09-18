@@ -48,11 +48,11 @@ export default function MasterGalleryPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-20">
+    <div className="min-h-screen bg-gray-900 text-white font-mono">
+      <header className="bg-gray-900/50 backdrop-blur-lg shadow-cyan-400/20 shadow-lg sticky top-0 z-20 border-b border-cyan-400/20">
         <div className="mx-auto flex h-16 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-gray-900">Master Gallery</h1>
-          <Link href="/dashboard" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+          <h1 className="text-2xl font-bold text-cyan-400 tracking-widest" style={{ textShadow: '0 0 5px #00ffff' }}>MASTER GALLERY</h1>
+          <Link href="/dashboard" className="text-sm font-medium text-cyan-400 hover:text-cyan-300">
             &larr; Back to Dashboard
           </Link>
         </div>
@@ -60,17 +60,20 @@ export default function MasterGalleryPage() {
 
       <main className="p-4 sm:p-6 lg:p-8">
         {loading ? (
-          <p className="text-center text-gray-500">Loading gallery...</p>
+          <p className="text-center text-cyan-400">Loading gallery...</p>
         ) : error ? (
-          <p className="text-center text-red-500">{error}</p>
+          <p className="text-center text-red-400">{error}</p>
         ) : allImages.length === 0 ? (
-          <p className="text-center text-gray-500">No images have been generated yet.</p>
+          <div className="text-center mt-16 border border-cyan-400/50 rounded-lg p-8 bg-gray-900/50">
+            <h3 className="text-xl font-medium text-cyan-400">NO IMAGES GENERATED YET</h3>
+            <p className="mt-2 text-gray-400">Your generated images will appear here.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {allImages.map((imageMsg, index) => (
               <div 
                 key={index} 
-                className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg shadow-md"
+                className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg border-2 border-transparent hover:border-cyan-400 transition-all duration-300 shadow-lg hover:shadow-cyan-400/20"
                 onClick={() => setModalImageUrl(imageMsg.imageUrl!)}
               >
                 <Image
@@ -79,7 +82,7 @@ export default function MasterGalleryPage() {
                   layout="fill"
                   className="object-cover transition-transform duration-300 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             ))}
           </div>
@@ -87,15 +90,15 @@ export default function MasterGalleryPage() {
       </main>
 
       {modalImageUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50" onClick={() => setModalImageUrl(null)}>
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 backdrop-blur-sm" onClick={() => setModalImageUrl(null)}>
           <div className="relative p-4" onClick={(e) => e.stopPropagation()}>
-            <Image src={modalImageUrl} alt="Enlarged outfit" width={800} height={800} className="max-w-screen-lg max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+            <Image src={modalImageUrl} alt="Enlarged outfit" width={800} height={800} className="max-w-screen-lg max-h-[80vh] object-contain rounded-lg shadow-2xl shadow-cyan-400/20" />
             <a
               href={modalImageUrl}
               download={`v-closet-image.png`}
-              className="absolute bottom-8 right-8 bg-indigo-600 text-white px-5 py-2 rounded-full hover:bg-indigo-700 text-sm font-semibold shadow-lg transition-transform hover:scale-105"
+              className="absolute bottom-8 right-8 bg-cyan-400 text-gray-900 px-5 py-2 rounded-full hover:bg-cyan-300 text-sm font-bold shadow-lg transition-transform hover:scale-105"
             >
-              Download
+              DOWNLOAD
             </a>
             <button 
               onClick={() => setModalImageUrl(null)} 
