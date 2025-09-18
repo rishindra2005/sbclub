@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
   try {
     const formData = await req.formData();
-    const imageFile = formData.get('image') as File | null;
+    const imageFiles = formData.getAll('image') as File[];
     const prompt = formData.get('prompt') as string;
     const historyString = formData.get('history') as string | null;
 
@@ -74,9 +74,11 @@ export async function POST(req: Request) {
 
     // Add the current message
     const currentUserParts: Part[] = [{ text: prompt }];
-    if (imageFile) {
-      const imagePart = await fileToGenerativePart(imageFile);
-      currentUserParts.push(imagePart);
+    if (imageFiles.length > 0) {
+      for (const imageFile of imageFiles) {
+        const imagePart = await fileToGenerativePart(imageFile);
+        currentUserParts.push(imagePart);
+      }
     }
     contents.push({ role: 'user', parts: currentUserParts });
 
