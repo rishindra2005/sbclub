@@ -1,0 +1,19 @@
+.promptInput {
+  color: #171717 !important;
+  background-color: #ffffff !important;
+}
+
+.promptInput::placeholder {
+  color: #9ca3af !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .promptInput {
+    color: #ededed !important;
+    background-color: #1f2937 !important;
+  }
+
+  .promptInput::placeholder {
+    color: #6b7280 !important;
+  }
+}

@@ -36,12 +36,30 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
   await connectToDB();
 
   try {
-    const { messages } = await req.json();
-    console.log("Received in PUT /api/trials/[id]:", JSON.stringify(messages, null, 2));
+    const { messages, name } = await req.json();
+
+    const updateData: { [key: string]: any } = {};
+    if (messages) {
+      updateData.messages = messages;
+    }
+    if (name) {
+      updateData.name = name;
+    }
+
+    // Sanitize messages for logging if they exist
+    if (messages) {
+      const sanitizedMessages = messages.map(msg => {
+          if (msg.imageUrl && msg.imageUrl.length > 100) {
+              return { ...msg, imageUrl: msg.imageUrl.substring(0, 100) + '... [TRUNCATED]' };
+          }
+          return msg;
+      });
+      console.log("Received in PUT /api/trials/[id]:", JSON.stringify(sanitizedMessages, null, 2));
+    }
 
     const updatedTrial = await Trial.findOneAndUpdate(
       { _id: context.params.id, userId: session.user.id },
-      { $set: { messages: messages } },
+      { $set: updateData },
       { new: true }
     );
 

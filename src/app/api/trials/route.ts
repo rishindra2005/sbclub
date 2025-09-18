@@ -23,7 +23,7 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(_req: Request) {
+export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
@@ -33,9 +33,12 @@ export async function POST(_req: Request) {
   await connectToDB();
 
   try {
+    const body = await req.json();
+    const name = body.name || `New Trial ${new Date().toLocaleString()}`;
+
     const newTrial = new Trial({
       userId: session.user.id,
-      name: `New Trial ${new Date().toLocaleString()}`,
+      name: name,
       messages: [],
     });
     await newTrial.save();

@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { GoogleGenAI, Part } from '@google/genai';
+import { GoogleGenAI, Part, Content } from '@google/genai';
+
+// Define the message interface locally to avoid model imports in API routes
+interface IMessage {
+  sender: 'user' | 'assistant';
+  text?: string;
+  imageUrl?: string;
+  createdAt: Date;
+}
 
 // Initialize the Google Generative AI client
 const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY!);
@@ -26,24 +34,58 @@ export async function POST(req: Request) {
 
   try {
     const formData = await req.formData();
-    const imageFile = formData.get('image') as File | null;
+    const imageFiles = formData.getAll('image') as File[];
     const prompt = formData.get('prompt') as string;
+    const historyString = formData.get('history') as string | null;
 
     if (!prompt) {
         return NextResponse.json({ message: 'Prompt is required' }, { status: 400 });
     }
 
     const modelName = "gemini-2.5-flash-image-preview";
-    const parts: Part[] = [{ text: prompt }];
 
-    if (imageFile) {
-      const imagePart = await fileToGenerativePart(imageFile);
-      parts.push(imagePart);
+    // Build the history
+    const contents: Content[] = [];
+    if (historyString) {
+        const history: IMessage[] = JSON.parse(historyString);
+        for (const message of history) {
+            const parts: Part[] = [];
+            if (message.text) {
+                parts.push({ text: message.text });
+            }
+            if (message.imageUrl) {
+                // Parse the data URL
+                const match = message.imageUrl.match(/^data:(image\/.+);base64,(.+)$/);
+                if (match) {
+                    parts.push({
+                        inlineData: {
+                            mimeType: match[1],
+                            data: match[2],
+                        }
+                    });
+                }
+            }
+            contents.push({
+                role: message.sender === 'assistant' ? 'model' : 'user',
+                parts: parts,
+            });
+        }
     }
+
+    // Add the current message
+    const currentUserParts: Part[] = [{ text: prompt }];
+    if (imageFiles.length > 0) {
+      for (const imageFile of imageFiles) {
+        const imagePart = await fileToGenerativePart(imageFile);
+        currentUserParts.push(imagePart);
+      }
+    }
+    contents.push({ role: 'user', parts: currentUserParts });
+
 
     const response = await genAI.models.generateContent({
         model: modelName,
-        contents: [{ role: "user", parts }],
+        contents: contents,
     });
 
     let text = '';
