@@ -1,11 +1,10 @@
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import connectToDB from '@/lib/db';
 import Trial from '@/models/trial.model';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, context: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -14,7 +13,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   await connectToDB();
 
   try {
-    const trial = await Trial.findOne({ _id: params.id, userId: session.user.id });
+    const trial = await Trial.findOne({ _id: context.params.id, userId: session.user.id });
 
     if (!trial) {
       return NextResponse.json({ message: 'Trial not found' }, { status: 404 });
@@ -27,7 +26,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, context: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
@@ -38,11 +37,15 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
   try {
     const { messages } = await req.json();
+    console.log("Received in PUT /api/trials/[id]:", JSON.stringify(messages, null, 2));
+
     const updatedTrial = await Trial.findOneAndUpdate(
-      { _id: params.id, userId: session.user.id },
+      { _id: context.params.id, userId: session.user.id },
       { $set: { messages: messages } },
       { new: true }
     );
+
+    console.log("Updated trial in DB:", updatedTrial);
 
     if (!updatedTrial) {
       return NextResponse.json({ message: 'Trial not found' }, { status: 404 });
@@ -55,7 +58,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, context: { params: { id: string } }) {
     // TODO: Implement trial deletion
     return NextResponse.json({ message: 'Not Implemented' }, { status: 501 });
 }

@@ -1,11 +1,10 @@
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI, Part } from '@google/genai';
 
 // Initialize the Google Generative AI client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY!);
 
 // Function to convert a file to a base64 string
 async function fileToGenerativePart(file: File) {
@@ -34,22 +33,38 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: 'Prompt is required' }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+    const modelName = "gemini-2.5-flash-image-preview";
+    const parts: Part[] = [{ text: prompt }];
 
-    let response;
     if (imageFile) {
-        const imagePart = await fileToGenerativePart(imageFile);
-        response = await model.generateContent([prompt, imagePart]);
-    } else {
-        response = await model.generateContent(prompt);
+      const imagePart = await fileToGenerativePart(imageFile);
+      parts.push(imagePart);
     }
 
-    const result = await response.response;
-    const text = result.text();
+    const response = await genAI.models.generateContent({
+        model: modelName,
+        contents: [{ role: "user", parts }],
+    });
+
+    let text = '';
+    let imageUrl = '';
+
+    if (response.candidates && response.candidates.length > 0) {
+        for (const part of response.candidates[0].content.parts) {
+            if (part.text) {
+                text += part.text;
+            } else if (part.inlineData) {
+                const imageData = part.inlineData.data;
+                const mimeType = part.inlineData.mimeType;
+                imageUrl = `data:${mimeType};base64,${imageData}`;
+            }
+        }
+    }
 
     const assistantResponse = {
       sender: 'assistant',
       text: text,
+      imageUrl: imageUrl,
       createdAt: new Date(),
     };
 
