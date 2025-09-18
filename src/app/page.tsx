@@ -1,6 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 export default function HomePage() {
+  const { status } = useSession();
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-violet-50">
       <div className="text-center">
@@ -11,12 +16,20 @@ export default function HomePage() {
           The future of fashion is here. Upload your photo, describe your dream outfit, and see it come to life with the power of AI.
         </p>
         <div className="mt-10 flex justify-center gap-4">
-          <Link href="/login" className="transform rounded-md bg-indigo-600 px-6 py-3 text-lg font-medium text-white shadow-lg transition-transform hover:scale-105 hover:bg-indigo-700">
-            Get Started
-          </Link>
-          <Link href="/signup" className="transform rounded-md bg-gray-200 px-6 py-3 text-lg font-medium text-gray-800 shadow-lg transition-transform hover:scale-105 hover:bg-gray-300">
-            Sign Up
-          </Link>
+          {status === 'authenticated' ? (
+            <Link href="/dashboard" className="transform rounded-md bg-indigo-600 px-6 py-3 text-lg font-medium text-white shadow-lg transition-transform hover:scale-105 hover:bg-indigo-700">
+              Get Started
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="transform rounded-md bg-indigo-600 px-6 py-3 text-lg font-medium text-white shadow-lg transition-transform hover:scale-105 hover:bg-indigo-700">
+                Get Started
+              </Link>
+              <Link href="/signup" className="transform rounded-md bg-gray-200 px-6 py-3 text-lg font-medium text-gray-800 shadow-lg transition-transform hover:scale-105 hover:bg-gray-300">
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </main>
