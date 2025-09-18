@@ -32,7 +32,19 @@ export async function POST(req: Request) {
 
     const modelName = "gemini-2.5-flash-image-preview";
     const imagePart = await fileToGenerativePart(imageFile);
-    const prompt = "Describe the outfit and the scene in this image in detail in 500 words.";
+    const prompt = `Please provide a detailed description of the outfit and the surrounding scene in the image, with a total length of approximately 500 words. 
+
+**For the outfit, please analyze:**
+- **Clothing Items:** Identify each piece of clothing worn by the person (e.g., shirt, pants, dress, jacket, etc.).
+- **Style and Cut:** Describe the style of each garment (e.g., bohemian, minimalist, vintage, streetwear) and its cut (e.g., slim-fit, oversized, A-line).
+- **Fabric and Texture:** Make an educated guess about the fabric of each item (e.g., cotton, denim, silk, wool) and its texture (e.g., smooth, ribbed, fuzzy).
+- **Color and Patterns:** Detail the colors and any patterns or prints on the clothing.
+- **Accessories:** Don't forget to mention any accessories like jewelry, bags, hats, or shoes.
+
+**For the scene, please describe:**
+- **Background:** What is in the background? Is it indoors or outdoors? A city street, a natural landscape, a room?
+- **Lighting and Mood:** Describe the lighting (e.g., bright sunlight, soft indoor light, neon lights) and the overall mood or atmosphere it creates (e.g., cheerful, melancholic, energetic).
+- **Composition:** How is the person placed in the frame? Are there any other interesting objects or elements in the scene?`;
 
     const contents = [{ role: 'user', parts: [imagePart, { text: prompt }] }];
 

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { ITrial, IMessage } from '@/models/trial.model';
 import ImageUploader from '@/components/ImageUploader';
+import OutfitBox from '@/components/OutfitBox';
 
 // Define user interface locally
 interface IUserProfile {
@@ -23,6 +24,9 @@ export default function TrialPage() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState('');
   const [userProfileImages, setUserProfileImages] = useState<string[]>([]);
+  const [outfitDescription, setOutfitDescription] = useState('');
+  const [describedImage, setDescribedImage] = useState<File | null>(null);
+  const [isDescribing, setIsDescribing] = useState(false);
 
   const params = useParams();
   const id = params.id as string;
@@ -57,34 +61,35 @@ export default function TrialPage() {
     }
   }, [id]);
 
-  useEffect(() => {
-    const handlePaste = (event: ClipboardEvent) => {
-      const items = event.clipboardData?.items;
-      if (!items) return;
-
-      const imageFiles: File[] = [];
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf('image') !== -1) {
-          const file = items[i].getAsFile();
-          if (file) {
-            const uniqueName = `pasted-image-${Date.now()}-${i}.${file.type.split('/')[1]}`;
-            const newFile = new File([file], uniqueName, { type: file.type });
-            imageFiles.push(newFile);
-          }
-        }
+  const handleImagePastedForDescription = async (file: File) => {
+    setDescribedImage(file);
+    setIsDescribing(true);
+    setOutfitDescription('');
+  
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+  
+      const res = await fetch('/api/gemini/describe', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!res.ok) {
+        throw new Error('Failed to describe outfit');
       }
-
-      if (imageFiles.length > 0) {
-        setSelectedImages(prev => [...prev, ...imageFiles]);
-      }
-    };
-
-    window.addEventListener('paste', handlePaste);
-
-    return () => {
-      window.removeEventListener('paste', handlePaste);
-    };
-  }, []);
+  
+      const { description } = await res.json();
+      console.log('Outfit Description:', description);
+      setOutfitDescription(description);
+  
+    } catch (error) {
+      console.error(error);
+      // handle error state in UI
+    } finally {
+      setIsDescribing(false);
+    }
+  };
 
   const handleUpdateTrialName = async () => {
     if (!trial || !editingName.trim()) return;
@@ -120,7 +125,14 @@ export default function TrialPage() {
 
     try {
       const formData = new FormData();
-      formData.append('prompt', inputText);
+      let prompt = inputText;
+      if (outfitDescription) {
+        prompt = `[Outfit Description: ${outfitDescription}] \n\n ${inputText}`;
+        setOutfitDescription(''); // Clear after use
+        setDescribedImage(null); // Clear the image preview
+      }
+      formData.append('prompt', prompt);
+
 
       if (trial.messages.length > 0) {
         formData.append('history', JSON.stringify(trial.messages));
@@ -247,7 +259,7 @@ export default function TrialPage() {
 
       {/* Footer */}
       <footer className="bg-white/80 backdrop-blur-lg p-4 border-t border-gray-200 z-10">
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-4xl">
           {userProfileImages.length > 0 && (
             <div className="mb-4">
               <p className="text-sm font-semibold text-gray-700 mb-2">Select from your profile images:</p>
@@ -261,11 +273,28 @@ export default function TrialPage() {
             </div>
           )}
 
-          <form onSubmit={handleSendMessage} className="flex items-center gap-3">
-            <ImageUploader onImageSelect={handleNewImageUpload} />
-            <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="Describe the outfit... or paste an image" className="flex-1 rounded-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" disabled={isAssistantTyping}/>
-            <button type="submit" className="rounded-full bg-indigo-600 p-2 text-white hover:bg-indigo-700 disabled:bg-gray-400" disabled={isAssistantTyping || (!inputText.trim() && selectedImages.length === 0)}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg></button>
-          </form>
+          <div className="flex items-start gap-3">
+            <form onSubmit={handleSendMessage} className="flex-1 flex items-center gap-3">
+              <ImageUploader onImageSelect={handleNewImageUpload} />
+              <textarea
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Describe the outfit... or paste an image"
+                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                rows={3}
+                disabled={isAssistantTyping}
+              />
+              <button type="submit" className="rounded-full bg-indigo-600 p-2 text-white hover:bg-indigo-700 disabled:bg-gray-400" disabled={isAssistantTyping || (!inputText.trim() && selectedImages.length === 0)}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg></button>
+            </form>
+            <div className="w-48">
+              <OutfitBox 
+                onImagePasted={handleImagePastedForDescription} 
+                isDescribing={isDescribing}
+                describedImage={describedImage}
+              />
+            </div>
+          </div>
+
           {selectedImages.length > 0 && (
             <p className="mt-2 text-sm text-gray-500">
               Selected: {selectedImages.map(f => f.name).join(', ')}
